@@ -82,22 +82,24 @@ if (isDev) {
   process.on('SIGTERM', cleanup);
 
 } else {
-  ensureDependencies();
+  const backendPublicIndex = path.join(backendDir, 'public', 'index.html');
+  const needsBuild = isBuildOnly || !fs.existsSync(backendPublicIndex);
 
-  // Build frontend
-  runSync(npmCmd, ['run', 'build'], frontendDir, 'Building frontend (Vite)');
+  if (needsBuild) {
+    ensureDependencies();
+    runSync(npmCmd, ['run', 'build'], frontendDir, 'Building frontend (Vite)');
 
-  // Copy dist to backend/public to guarantee it is always available
-  try {
-    const backendPublic = path.join(backendDir, 'public');
-    const frontendDist = path.join(frontendDir, 'dist');
-    if (fs.existsSync(frontendDist)) {
-      if (!fs.existsSync(backendPublic)) fs.mkdirSync(backendPublic, { recursive: true });
-      fs.cpSync(frontendDist, backendPublic, { recursive: true });
-      console.log('✅ Synchronized frontend build to backend/public');
+    try {
+      const backendPublic = path.join(backendDir, 'public');
+      const frontendDist = path.join(frontendDir, 'dist');
+      if (fs.existsSync(frontendDist)) {
+        if (!fs.existsSync(backendPublic)) fs.mkdirSync(backendPublic, { recursive: true });
+        fs.cpSync(frontendDist, backendPublic, { recursive: true });
+        console.log('✅ Synchronized frontend build to backend/public');
+      }
+    } catch (err) {
+      console.warn('⚠️ Could not copy frontend dist to backend public:', err.message);
     }
-  } catch (err) {
-    console.warn('⚠️ Could not copy frontend dist to backend public:', err.message);
   }
 
   if (isBuildOnly) {
@@ -106,6 +108,5 @@ if (isDev) {
   }
 
   console.log('🚀 Starting BloodConnect Production Server...');
-
   require(path.join(backendDir, 'server.js'));
 }
