@@ -1,0 +1,19 @@
+{
+  "name": "bloodconnect-unified",
+  "version": "1.0.0",
+  "description": "BloodConnect - Full Stack Emergency Blood Donation Platform",
+  "main": "run.js",
+  "scripts": {
+    "build": "node run.js --build",
+    "start": "node run.js",
+    "dev": "node run.js --dev"
+  },
+  "keywords": [
+    "blood-donation",
+    "mern",
+    "react",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT"
+}
