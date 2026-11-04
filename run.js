@@ -82,20 +82,14 @@ if (isDev) {
   process.on('SIGTERM', cleanup);
 
 } else {
-  // Production / Build mode
   ensureDependencies();
-
-  // Build frontend
-  runSync(npmCmd, ['run', 'build'], frontendDir, 'Building frontend (Vite)');
 
   if (isBuildOnly) {
     console.log('🎉 Build completed successfully!');
     process.exit(0);
   }
 
-  // Start unified server
-  console.log('🚀 Starting Unified BloodConnect Server on Node.js...');
-  console.log('   (Express backend will serve API + React frontend on single port)\n');
+  console.log('🚀 Starting BloodConnect Production Server...');
 
   require(path.join(backendDir, 'server.js'));
 }
