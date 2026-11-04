@@ -40,15 +40,28 @@ app.use('/api/admin', adminRoutes);
 // Serve Frontend in Production / Built State
 const path = require('path');
 const fs = require('fs');
-const frontendDist = path.join(__dirname, '../frontend/dist');
-if (fs.existsSync(frontendDist)) {
-  app.use(express.static(frontendDist));
+
+const possiblePaths = [
+  path.join(__dirname, 'public'),
+  path.join(__dirname, '../frontend/dist'),
+  path.join(process.cwd(), 'frontend/dist'),
+  path.join(process.cwd(), 'backend/public'),
+  path.join(process.cwd(), 'public'),
+];
+
+const staticDir = possiblePaths.find((dir) => fs.existsSync(path.join(dir, 'index.html')));
+
+if (staticDir) {
+  console.log(`[Frontend]: Serving static web assets from ${staticDir}`);
+  app.use(express.static(staticDir));
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api')) {
       return next();
     }
-    res.sendFile(path.join(frontendDist, 'index.html'));
+    res.sendFile(path.join(staticDir, 'index.html'));
   });
+} else {
+  console.warn('[Frontend]: No built frontend found in possible directories.');
 }
 
 // Error Handling Middlewares
